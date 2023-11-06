@@ -35,12 +35,13 @@ const Login = () => {
 
     return (
 
-        <div className='MyContainer min-h-[calc(100vh-100px)] flex flex-col md:flex-row items-center justify-center gap-5'>
+        <div className=' min-h-[calc(100vh-100px)] flex flex-col md:flex-row items-center justify-center gap-5'>
             <div data-aos="fade-left">
                 <div className="h-[500px] w-full">
                     <Lottie className='h-full w-full' animationData={login} loop={true} />
                 </div>
-            </div><div className="divider mx-auto w-28 md:w-2 md:h-28 md:my-auto md:divider-horizontal"></div>
+            </div>
+            <div className="divider mx-auto w-28 md:w-[2px] md:h-28 md:my-auto md:divider-horizontal bg-[#004d73]"></div>
             <div data-aos="fade-right" className='md:w-1/2 w-full text-center '>
                 <form className='bg-base-100 rounded p-4 shadow mb-3'>
                     {/* onSubmit={handleSubmit(onSubmit)} */}
@@ -70,17 +71,14 @@ const Login = () => {
                         </div>
                     </div>
 
-
-
                     {/* Submit */}
                     <input className='btn rounded-full text-white hover:primary_text border primary_bg font-semibold w-[70%] md:w-[60%] hover:bg-[#143341]' type="submit" value='Login' />
                 </form>
 
                 <p className='my-4'>If you are new here?please <Link to={'/registration'} className="text-[#0010f5]">Register</Link> or Login With</p>
 
+                {/* Social Media */}
                 <div>
-
-
                     <button className='btn rounded-full w-[70%] md:w-[55%] hover:bg-[#143341] text-white primary_bg'><FaGoogle /></button>
                 </div>
             </div>
