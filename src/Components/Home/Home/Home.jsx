@@ -1,25 +1,25 @@
-import { useGetCoursesListQuery } from "../../../redux/Features/api/baseApi";
+// import { useGetCoursesListQuery } from "../../../redux/Features/api/baseApi";
 
 const Home = () => {
 
-    const { isError, data, isLoading } = useGetCoursesListQuery();
+    // const { isError, data, isLoading } = useGetCoursesListQuery();
 
-    if (isLoading) {
+    // if (isLoading) {
         
-        return <p> Loading </p>
+    //     return <p> Loading </p>
 
-    }
-    console.log(data);
+    // }
+    // console.log(data);
 
 
     return (
         <div>
             <h3>This is home page</h3>
-            {
+            {/* {
                 data && data.map(singleData => <p
                     key={singleData.id}
                 > {singleData.title}</p>)
-            }
+            } */}
         </div>
     );
 };
