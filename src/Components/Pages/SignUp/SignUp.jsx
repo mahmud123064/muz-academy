@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Lottie from "lottie-react";
 import registerAnimation from '../../../../public/login.json'
 import { useForm } from "react-hook-form";
@@ -6,20 +6,44 @@ import { useForm } from "react-hook-form";
 // import placeImage from '../../assets/upload.png'
 
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../Provider/AuthProvider';
+import Swal from 'sweetalert2';
 // import useAuth from '../../Hooks/useAuth';
 // import Social from '../../Components/Social';
 // import { updateProfile } from 'firebase/auth';
 //Main function 
 const SignUp = () => {
-    // const navigate = useNavigate()
-    // const { auth, createAccount } = useAuth()
-    const [show, setShow] = useState(false)
-    const [img, setImg] = useState()
-    // const [Toast] = useToast()
-    const { register, handleSubmit } = useForm();
+
+    const { createUser, updateUser } = useContext(AuthContext)
+    const [show, setShow] = useState(false);
+    const navigate = useNavigate()
+
+    const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const onSubmit = async (data) => {
         console.log(data);
+
+        createUser(data.email, data.password)
+        .then(result => {
+            const loggedUser = result.user;
+            console.log(loggedUser);
+
+            updateUser(data.name, data.image)
+            .then(()=> {
+                console.log("user profile updated");
+                reset();
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "Your work has been saved",
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                  navigate("/")
+            })
+            .catch(error => console.log(error))
+        })
+
         // // console.log(data)
         // if (data.password.length <= 6) {
         //     Toast.fire({
@@ -113,12 +137,12 @@ const SignUp = () => {
     };
 
 
-    const handleImageChange = (e) => {
-        const image = e.target.files[0]
-        const imgLink = URL.createObjectURL(image)
-        setImg(imgLink)
+    // const handleImageChange = (e) => {
+    //     const image = e.target.files[0]
+    //     const imgLink = URL.createObjectURL(image)
+    //     setImg(imgLink)
 
-    }
+    // }
     return (
         <div className='MyContainer min-h-[calc(100vh-100px)] flex flex-col md:flex-row items-center justify-center gap-5'>
             <div data-aos="fade-left">
@@ -128,6 +152,7 @@ const SignUp = () => {
             </div>
             <div className="divider mx-auto w-28 md:w-[2px] md:h-28 md:my-auto md:divider-horizontal bg-[#004d73]"></div>
             <div data-aos="fade-right" className='md:w-1/2 w-full text-center '>
+
                 <form className='bg-base-100 rounded p-4 shadow' onSubmit={handleSubmit(onSubmit)}>
                     {/* register your input into the hook by invoking the "register" function */}
                     <div className=" form-control rounded-full -mt-2 w-full " >
@@ -139,15 +164,7 @@ const SignUp = () => {
                         </label> */}
 
 
-                        <div className='flex gap-3 flex-col lg:flex-row'>
-                            <input type="file" className=" file-input file-input-bordered w-full border-[#004d73] rounded-full -mt-2" accept='image/*'   {...register("image")} onChange={handleImageChange} required />
 
-                            <select required {...register("role", { required: true })} className="select select-bordered border-[#004d73] rounded-full -mt-2 w-full lg:w-1/2 "
-                                defaultValue={"Student"}
-                            >
-                                <option>Student</option>
-                            </select>
-                        </div>
                     </div>
 
                     <div className="form-control w-full ">
@@ -171,10 +188,41 @@ const SignUp = () => {
                             <span className="label-text font-semibold ml-2">Password*</span>
                         </label>
                         <div className='relative'>
-                            <input {...register("password")} type={show ? "text" : "password"} placeholder="Enter Your Password" className="input input-bordered rounded-full -mt-2  border-[#004d73]  w-full" required />
+                            <input {...register("password",
+                                {
+                                    required: true,
+                                    minLength: 6,
+                                    maxLength: 20,
+                                    pattern: /(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z].*)/
+                                })} type={show ? "text" : "password"} placeholder="Enter Your Password" className="input input-bordered rounded-full -mt-2  border-[#004d73]  w-full" />
+
+                            {errors.password?.type === 'minLength' && <p role="alert">Password must have 6 characters</p>}
+
+                            {errors.password?.type === 'maxLength' && <p role="alert">Password must have less than 20 characters</p>}
+
+                            {errors.password?.type === 'pattern' && <p role="alert">Password must have one lower case one upper case, one number and one special character</p>}
+
                             <p onClick={() => setShow(!show)} className='rounded-full -mt-2 hover:bg-slate-300 p-[15px] absolute right-px top-1/2 -translate-y-1/2'>{
                                 show ? <FaEyeSlash /> : <FaEye />
                             }</p>
+
+                            {/* ///////////////////// */}
+
+                            {/* <input type="password" {...register("password",
+                                {
+                                    required: true,
+                                    minLength: 6,
+                                    maxLength: 20,
+                                    pattern: /(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z].*)/
+                                })} name="password" placeholder="password" className="input input-bordered rounded-full -mt-2  border-[#004d73]  w-full" /> */}
+                            {/* {errors.firstName?.type === 'required' && <p role="alert">First name is required</p>} */}
+                            {/* {errors.password && <span className="text-red-500">Password  is required</span>} */}
+
+                            {/* {errors.password?.type === 'minLength' && <p role="alert">Password must have 6 characters</p>}
+
+                            {errors.password?.type === 'maxLength' && <p role="alert">Password must have less than 20 characters</p>}
+
+                            {errors.password?.type === 'pattern' && <p role="alert">Password must have one lower case one upper case, one number and one special character</p>} */}
                         </div>
                     </div>
 
@@ -182,12 +230,39 @@ const SignUp = () => {
                         <label className="label">
                             <span className="label-text font-semibold ml-2">Confirm Password*</span>
                         </label>
+
                         <div className='relative'>
-                            <input {...register("ConfirmPassword")} type={show ? "text" : "password"} placeholder="Enter Confirm Password" className="input input-bordered rounded-full -mt-2  border-[#004d73]  w-full" required />
+                        <input {...register("confirmPassword",
+                                {
+                                    required: true,
+                                    minLength: 6,
+                                    maxLength: 20,
+                                    pattern: /(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z].*)/
+                                })} type={show ? "text" : "confirmPassword"} placeholder="Enter Your Password" className="input input-bordered rounded-full -mt-2  border-[#004d73]  w-full" />
+
+                            {errors.password?.type === 'minLength' && <p role="alert">Password must have 6 characters</p>}
+
+                            {errors.password?.type === 'maxLength' && <p role="alert">Password must have less than 20 characters</p>}
+
+                            {errors.password?.type === 'pattern' && <p role="alert">Password must have one lower case one upper case, one number and one special character</p>}
+
                             <p onClick={() => setShow(!show)} className='rounded-full -mt-2 hover:bg-slate-300 p-[15px] absolute right-px top-1/2 -translate-y-1/2'>{
                                 show ? <FaEyeSlash /> : <FaEye />
                             }</p>
                         </div>
+                    </div>
+
+                    <div className='form-control mb-2 w-full'>
+                        <label className="label">
+                            <span className="label-text font-semibold ml-2">Upload your Image*</span>
+                        </label>
+                        <input type="file" className=" file-input file-input-bordered w-full border-[#004d73] rounded-full -mt-2" accept='image/*'   {...register("image")} required />
+
+                        {/* <select required {...register("role", { required: true })} className="select select-bordered border-[#004d73] rounded-full -mt-2 w-full lg:w-1/2 "
+                                defaultValue={"Student"}
+                            >
+                                <option>Student</option>
+                            </select> */}
                     </div>
 
                     {/* Submit */}

@@ -1,37 +1,44 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 // import Social from '../../Components/Social';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Lottie from "lottie-react";
 import login from "../../../../public/login.json"
+import { AuthContext } from '../../../Provider/AuthProvider';
+import Swal from 'sweetalert2';
 // import useAuth from '../../Hooks/useAuth';
 // import useToast from '../../Hooks/useToast';
 
 const Login = () => {
-    // const { loginWithEmail } = useAuth()
-    // const [Toast] = useToast()
     const [show, setShow] = useState(false)
     const { register, handleSubmit } = useForm();
-    // const onSubmit = async (data) => {
-    // console.log(data);
-    // if (data.email) {
-    //     loginWithEmail(data.email, data.password).then(data => {
-    //         // console.log(data)
-    //         Toast.fire({
-    //             icon: 'success',
-    //             title: ' Login Successfully'
-    //         })
 
-    //     }).catch(err => {
-    //         Toast.fire({
-    //             icon: 'error',
-    //             title: err.message
-    //         })
+    const navigate = useNavigate()
+    const location = useLocation()
 
-    //     })
-    // }
-    // }
+    const from = location.state?.from?.pathname || "/"
+
+    const { signIn } = useContext(AuthContext);
+    const onSubmit = async (data) => {
+        console.log(data);
+
+        signIn(data.email, data.password)
+            .then(result => {
+                const user = result.user;
+                console.log(user);
+
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "You have Successfully Logged In",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
+                navigate(from, { replace: true });
+            })
+    }
 
     return (
 
@@ -43,11 +50,9 @@ const Login = () => {
             </div>
             <div className="divider mx-auto w-28 md:w-[2px] md:h-28 md:my-auto md:divider-horizontal bg-[#004d73]"></div>
             <div data-aos="fade-right" className='md:w-1/2 w-full text-center '>
-                <form className='bg-base-100 rounded p-4 shadow mb-3'>
+                <form onSubmit={handleSubmit(onSubmit)} className='bg-base-100 rounded p-4 shadow mb-3'>
                     {/* onSubmit={handleSubmit(onSubmit)} */}
                     {/* register your input into the hook by invoking the "register" function */}
-
-
 
 
                     <div className="form-control mb-2 w-full">
@@ -75,7 +80,7 @@ const Login = () => {
                     <input className='btn rounded-full text-white hover:primary_text border primary_bg font-semibold w-[70%] md:w-[60%] hover:bg-[#143341]' type="submit" value='Login' />
                 </form>
 
-                <p className='my-4'>If you are new here?please <Link to={'/registration'} className="text-[#0010f5]">Register</Link> or Login With</p>
+                <p className='my-4'>If you are new here?please <Link to={'/signup'} className="text-[#0010f5]">Register</Link> or Login With</p>
 
                 {/* Social Media */}
                 <div>
